@@ -147,7 +147,7 @@ if(!empty($enum)){
     {
         return [
 <?php foreach ($labels as $name => $label): ?>
-            <?= "'$name' => " . $generator->generateString($label) . ",\n" ?>
+            <?= "'$name' => " . str_replace(' ID', '', $generator->generateString($label)) . ",\n" ?>
 <?php endforeach; ?>
         ];
     }
