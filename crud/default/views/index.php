@@ -81,13 +81,7 @@ echo '?>';
 <div class="giiant-crud <?= Inflector::camel2id(StringHelper::basename($generator->modelClass), '-', true) ?>-index">
 
     <!-- flash message -->
-    <?= "<?php if (\\Yii::\$app->session->getFlash('deleteError') !== null) : ?>
-        <div class=\"alert alert-info alert-dismissible\" role=\"alert\">
-            <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">
-            <span aria-hidden=\"true\">&times;</span></button>
-            <?= implode(\"\\n\", \Yii::\$app->session->getFlash('deleteError')); ?>
-        </div>
-    <?php endif; ?>" ?>
+    <?= "<?=" ?> $this->render('@vendor/fredyns/yii2-components/views/alert'); ?>
 
     <?=
     "<?php\n".($generator->indexWidgetType === 'grid' ? '// ' : '') ?>

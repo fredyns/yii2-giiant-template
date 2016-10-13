@@ -182,6 +182,8 @@ $model = new <?= $modelClass ?>Form;
 
 try {
 if ($model->load($_POST) && $model->save()) {
+                \Yii::$app->getSession()->addFlash('success', "Data successfully saved!");
+
 return $this->redirect(['view', <?= $urlParams ?>]);
 } elseif (!\Yii::$app->request->isPost) {
 $model->load($_GET);
@@ -213,6 +215,8 @@ $model = $this->findForm(<?= $actionParams ?>);
     }
 
 if ($model->load($_POST) && $model->save()) {
+            \Yii::$app->getSession()->addFlash('success', "Data successfully updated!");
+
 return $this->redirect(ReturnUrl::getUrl(Url::previous()));
 } else {
 return $this->render('update', [
@@ -239,10 +243,13 @@ try {
                 throw $actionControl->exception('delete');
             }
 
-            $model->delete();
+            if ($model->delete() !== FALSE)
+            {
+                \Yii::$app->getSession()->addFlash('info', "Data successfully deleted!");
+            }
 } catch (\Exception $e) {
 $msg = (isset($e->errorInfo[2]))?$e->errorInfo[2]:$e->getMessage();
-\Yii::$app->getSession()->addFlash('deleteError', $msg);
+\Yii::$app->getSession()->addFlash('error', $msg);
 } finally {
 return $this->redirect(ReturnUrl::getUrl(Url::previous()));    
 }
