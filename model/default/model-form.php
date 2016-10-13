@@ -28,7 +28,10 @@ use fredyns\components\helpers\StringHelper;
 class <?= $className ?>Form extends <?= $className . "\n" ?>
 {
 
-public function behaviors()
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
     {
         return ArrayHelper::merge(
             parent::behaviors(),
@@ -38,13 +41,21 @@ public function behaviors()
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
-        return ArrayHelper::merge(
-             parent::rules(),
-             [
-                  # custom validation rules
-             ]
-        );
+        return [
+          /* filter */
+          /* default value */
+          /* required */
+          /* safe */
+          /* field type */
+          /* value limitation */
+          /* value references */
+          <?= implode(",\n            ", $rules) . ",\n" ?>
+        ];
     }
+
 }
