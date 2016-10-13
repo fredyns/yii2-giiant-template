@@ -32,11 +32,11 @@ echo "<?php\n";
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\GridView;
 use yii\widgets\DetailView;
 use yii\widgets\Pjax;
 use dmstr\bootstrap\Tabs;
 use cornernote\returnurl\ReturnUrl;
+use kartik\grid\GridView;
 
 /**
 * @var yii\web\View $this
@@ -134,16 +134,6 @@ $this->params['breadcrumbs'][] = $actionControl->breadcrumbLabel('view');
 
     <?= $generator->partialView('detail_append', $model); ?>
 
-    <hr/>
-
-    <?= '<?= ' ?>Html::a('<span class="glyphicon glyphicon-trash"></span> ' . <?= $generator->generateString(
-        'Delete'
-    ) ?>, ['delete', 'ru' => ReturnUrl::getRequestToken(), <?= $urlParams ?>],
-    [
-    'class' => 'btn btn-danger',
-    'data-confirm' => '' . <?= $generator->generateString('Are you sure to delete this item?') ?> . '',
-    'data-method' => 'post',
-    ]); ?>
     <?= "<?php \$this->endBlock(); ?>\n\n"; ?>
 
     <?php
@@ -169,66 +159,6 @@ EOS;
 
         $showAllRecords = false;
 
-        if ($relation->via !== null) {
-            $pivotName = Inflector::pluralize($generator->getModelByTableName($relation->via->from[0]));
-            $pivotRelation = $model->{'get'.$pivotName}();
-            $pivotPk = key($pivotRelation->link);
-
-            $addButton = "  <?= Html::a(
-            '<span class=\"glyphicon glyphicon-link\"></span> ' . ".$generator->generateString('Attach')." . ' ".
-                Inflector::singularize(Inflector::camel2words($name)).
-                "', ['".$generator->createRelationRoute($pivotRelation, 'create')."', 'ru' => ReturnUrl::getToken(), '".
-                Inflector::singularize($pivotName)."'=>['".key(
-                    $pivotRelation->link
-                )."'=>\$model->{$model->primaryKey()[0]}]],
-            ['class'=>'btn btn-info btn-xs']
-        ) ?>\n";
-        } else {
-            $addButton = '';
-        }
-
-
-        // relation list, add, create buttons
-        echo "<div style='position: relative'>\n<div style='position:absolute; right: 0px; top: 0px;'>\n";
-
-        // formulate action controls
-        $modelName = Inflector::singularize(Inflector::camel2words($name));
-        $actionControlClass = $modelName.'ActControl';
-        $actionControlClassname = $actControlNamespace .'\\'. $actionControlClass;
-
-        if (class_exists($actionControlClassname)) {            
-            echo "
-                <?php
-                    \${$actionControlClass} = new \\{$actionControlClassname};
-
-                    echo \${$actionControlClass}->button('create', [
-                        'label'      => 'New {$modelName}',
-                        'urlOptions' => [
-                            '{$modelName}Form' => [
-                                '".key($relation->link)."' => \$model->".$model->primaryKey()[0].",
-                            ],
-                        ],
-                        'buttonOptions' => [
-                            'class'      => 'btn btn-info btn-xs',
-                        ],
-                    ]);
-                ?>
-            ";
-        } else {
-
-        // TODO: support multiple PKs
-        echo "  <?= Html::a(
-            '<span class=\"glyphicon glyphicon-plus\"></span> ' . ".$generator->generateString('New')." . ' ".
-            Inflector::singularize(Inflector::camel2words($name))."',
-            ['".$generator->createRelationRoute($relation, 'create')."', 'ru' => ReturnUrl::getToken(), '".
-            Inflector::id2camel($generator->generateRelationTo($relation), '-', true)."' => ['".key($relation->link)."' => \$model->".$model->primaryKey()[0]."]],
-            ['class'=>'btn btn-success btn-xs']
-        ); ?>\n";
-        }
-
-        echo $addButton;
-
-        echo "</div>\n</div>\n"; #<div class='clearfix'></div>\n";
         // render pivot grid
         if ($relation->via !== null) {
             $pjaxId = "pjax-{$pivotName}";
@@ -245,7 +175,7 @@ EOS;
         // render relation grid
         if (!empty($output)):
             echo "<?php Pjax::begin(['id'=>'pjax-{$name}', 'enableReplaceState'=> false, 'linkSelector'=>'#pjax-{$name} ul.pagination a, th a', 'clientOptions' => ['pjax:success'=>'function(){alert(\"yo\")}']]) ?>\n";
-            echo "<?=\n ".$output."\n?>\n";
+            echo "<?php\n ".$output."\n?>\n";
             echo "<?php Pjax::end() ?>\n";
         endif;
 

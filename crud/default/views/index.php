@@ -203,11 +203,11 @@ echo "?>\n"
             'exportConfig'        => [
                 GridView::EXCEL => [
                     'label'    => 'Save as EXCEL',
-                    'filename' => 'Provinsi_list',
+                    'filename' => '<?= $modelName ?>',
                 ],
                 GridView::PDF   => [
                     'label'    => 'Save as PDF',
-                    'filename' => 'Provinsi_list',
+                    'filename' => '<?= $modelName ?>',
                 ],
             ],
             'panel'               => [
