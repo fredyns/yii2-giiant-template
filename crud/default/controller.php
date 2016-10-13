@@ -114,7 +114,7 @@ public function actionIndex()
 <?php if ($searchModelClass !== '') {
     ?>
     $searchModel  = new <?= $searchModelClassName ?>;
-    $dataProvider = $searchModel->search($_GET);
+    $dataProvider = $searchModel->index($_GET);
 <?php 
 } else {
     ?>
@@ -137,6 +137,50 @@ return $this->render('index', [
 <?php endif; ?>
 ]);
 }
+
+<?php if (in_array('fredyns\components\traits\ModelSoftDelete', class_uses($generator->modelClass))): ?>
+
+/**
+* Lists deleted <?= $modelClass ?> models.
+* @return mixed
+*/
+public function actionDeleted()
+{
+    $actionControl = new <?= $actioncontrolClass ?>();
+
+    if ($actionControl->allow('deleted') == FALSE)
+    {
+        return $actionControl->exception('deleted');
+    }
+
+<?php if ($searchModelClass !== '') {
+    ?>
+    $searchModel  = new <?= $searchModelClassName ?>;
+    $dataProvider = $searchModel->deleted($_GET);
+<?php 
+} else {
+    ?>
+    $dataProvider = new ActiveDataProvider([
+    'query' => <?= $modelClass ?>::find(),
+    ]);
+<?php 
+} ?>
+
+Tabs::clearLocalStorage();
+Url::remember();
+
+\Yii::$app->session['__crudReturnUrl'] = null;
+
+return $this->render('deleted', [
+'dataProvider' => $dataProvider,
+'actionControl' => $actionControl,
+<?php if ($searchModelClass !== ''): ?>
+    'searchModel' => $searchModel,
+<?php endif; ?>
+]);
+}
+
+<?php endif; ?>
 
 /**
 * Displays a single <?= $modelClass ?> model.
@@ -228,7 +272,7 @@ return $this->render('update', [
 
 /**
 * Deletes an existing <?= $modelClass ?> model.
-* If deletion is successful, the browser will be redirected to the 'index' page.
+* If deletion is successful, the browser will be redirected to the previous page.
 * <?= implode("\n\t * ", $actionParamComments)."\n" ?>
 * @return mixed
 */
@@ -255,6 +299,38 @@ return $this->redirect(ReturnUrl::getUrl(Url::previous()));
 }
 }
 
+<?php if (in_array('fredyns\components\traits\ModelSoftDelete', class_uses($generator->modelClass))): ?>
+
+/**
+* Restores an deleted <?= $modelClass ?> model.
+* If restoration is successful, the browser will be redirected to the previous page.
+* <?= implode("\n\t * ", $actionParamComments)."\n" ?>
+* @return mixed
+*/
+public function actionRestore(<?= $actionParams ?>)
+{
+try {
+            $model         = $this->findModel(<?= $actionParams ?>);
+    $actionControl = new <?= $actioncontrolClass ?>(['model' => $model]);
+
+            if ($actionControl->allow('restore') == FALSE)
+            {
+                throw $actionControl->exception('restore');
+            }
+
+            if ($model->restore() !== FALSE)
+            {
+                \Yii::$app->getSession()->addFlash('success', "Data successfully restored!");
+            }
+} catch (\Exception $e) {
+$msg = (isset($e->errorInfo[2]))?$e->errorInfo[2]:$e->getMessage();
+\Yii::$app->getSession()->addFlash('error', $msg);
+} finally {
+return $this->redirect(ReturnUrl::getUrl(Url::previous()));    
+}
+}
+
+<?php endif; ?>
 /**
 * Finds the <?= $modelClass ?> model based on its primary key value.
 * If the model is not found, a 404 HTTP exception will be thrown.

@@ -17,6 +17,8 @@ $labels = $generator->generateSearchLabels();
 $searchAttributes = $generator->getSearchAttributes();
 $searchConditions = $generator->generateSearchConditions();
 
+$softDelete = in_array('fredyns\components\traits\ModelSoftDelete', class_uses($generator->modelClass));
+
 echo "<?php\n";
 ?>
 
@@ -52,6 +54,46 @@ public function scenarios()
 return Model::scenarios();
 }
 
+    /**
+     * search models
+     *
+     * @param array   $params
+     * 
+     * @return ActiveDataProvider
+     */
+    public function index($params)
+    {
+        $this->load($params);
+
+<?php if ($softDelete): ?>
+
+        $this->recordStatus = static::RECORDSTATUS_ACTIVE;
+
+<?php endif; ?>
+
+        return $this->search();
+    }
+
+<?php if ($softDelete): ?>
+
+    /**
+     * search deleted models
+     *
+     * @param array   $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function deleted($params)
+    {
+        $this->load($params);
+
+        $this->recordStatus = static::RECORDSTATUS_DELETED;
+
+        return $this->search();
+    }
+
+<?php endif; ?>
+
 /**
 * Creates data provider instance with search query applied
 *
@@ -59,15 +101,13 @@ return Model::scenarios();
 *
 * @return ActiveDataProvider
 */
-public function search($params)
+public function search()
 {
 $query = <?= isset($modelAlias) ? $modelAlias : $modelClass ?>::find();
 
 $dataProvider = new ActiveDataProvider([
 'query' => $query,
 ]);
-
-$this->load($params);
 
 if (!$this->validate()) {
 // uncomment the following line if you do not want to any records when validation fails
