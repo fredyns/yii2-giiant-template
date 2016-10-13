@@ -68,6 +68,24 @@ class Generator extends \schmunk42\giiant\generators\crud\Generator
         );
     }
 
+    public function render($template, $params = [])
+    {
+        $code   = parent::render($template, $params);
+        $tmpDir = Yii::getAlias('@runtime/giiant');
+
+        FileHelper::createDirectory($tmpDir);
+
+        $tmpFile = $tmpDir.'/'.md5($template);
+
+        file_put_contents($tmpFile, $code);
+
+        $command = Yii::getAlias('@vendor/bin/phptidy').' replace '.$tmpFile;
+
+        shell_exec($command);
+
+        return file_get_contents($tmpFile);
+    }
+
     public function generate()
     {
         $accessDefinitions = require $this->getTemplatePath().'/access_definition.php';
