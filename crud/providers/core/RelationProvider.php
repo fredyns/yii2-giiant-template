@@ -102,7 +102,7 @@ EOS;
         $columns = <<<EOS
 [
                     'class' => 'kartik\grid\SerialColumn',
-],\n
+],
 EOS;
 
         if (!$this->generator->isPivotRelation($relation))
@@ -144,7 +144,8 @@ EOS;
 
         $reflection             = new \ReflectionClass($relation->modelClass);
         $actionControlNamespace = strstr($this->generator->modelClass, 'models\\', TRUE).'actioncontrols';
-        $actionControlClass     = $reflection->getShortName().'ActControl';
+        $modelClass             = $reflection->getShortName();
+        $actionControlClass     = $modelClass.'ActControl';
         $actionControlClassname = $actionControlNamespace.'\\'.$actionControlClass;
 
         $actionColumn = <<<EOS
@@ -213,10 +214,21 @@ EOS;
         $pageParam      = Inflector::slug("page-{$name}");
         $firstPageLabel = $this->generator->generateString('First');
         $lastPageLabel  = $this->generator->generateString('Last');
-        $code           = "'<div class=\"table-responsive\">'\n . ";
-        $code .= <<<EOS
-\\kartik\\grid\\GridView::widget([
-    'layout' => '{summary}{pager}<br/>{items}{pager}',
+        $relationship   = "'".key($relation->link)."' => \$model->".$model->primaryKey()[0];
+        $code           = <<<EOS
+
+\${$actionControlClass} = new \\{$actionControlClassname};
+
+\$add{$modelClass} = \${$actionControlClass}->button('create', [
+    'label'      => 'New {$modelClass}',
+    'urlOptions' => [
+        '{$modelClass}Form' => [{$relationship}],
+    ],
+]);
+
+echo '<div class=\"table-responsive\">';
+echo GridView::widget([
+    //'layout' => '{summary}{pager}<br/>{items}{pager}',
     'dataProvider' => new \\yii\\data\\ActiveDataProvider([
         {$query},
         'pagination' => [
@@ -229,11 +241,59 @@ EOS;
         'firstPageLabel' => {$firstPageLabel},
         'lastPageLabel'  => {$lastPageLabel}
     ],
-    'columns' => [\n $columns]
-])
+	'tableOptions' => ['class' => 'table table-striped table-bordered table-hover'],
+	'headerRowOptions' => ['class'=>'x'],
+    'columns' => [\n $columns],
+	'containerOptions'    => ['style' => 'overflow: auto'], // only set when \$responsive = false
+	'headerRowOptions'    => ['class' => 'kartik-sheet-style'],
+	'filterRowOptions'    => ['class' => 'kartik-sheet-style'],
+	'pjax'                => FALSE, // pjax is set to always true for this demo
+	'toolbar'             => [
+		\$add{$modelClass}.' {export}',
+	],
+	'export'              => [
+		'icon'  => 'export',
+		'label' => 'Export',
+	],
+	//'bordered'            => true,
+	'striped'             => true,
+	'condensed'           => true,
+	'responsive'          => true,
+	'hover'               => true,
+	'showPageSummary'     => true,
+	'persistResize'       => false,
+	'exportConfig'        => [
+		GridView::EXCEL => [
+			'label'    => 'Save as EXCEL',
+			'filename' => \$this->title . ' - {$modelClass}',
+		],
+		GridView::PDF   => [
+			'label'    => 'Save as PDF',
+			'filename' => \$this->title . ' - {$modelClass}',
+		],
+	],
+	'panel'               => [
+		'type' => GridView::TYPE_PRIMARY,
+        'heading' => false,
+	],
+	'panelBeforeTemplate' => '
+                <div class="clearfix">{summary}</div>
+                <div class="pull-right">
+                    <div class="btn-toolbar kv-grid-toolbar" role="toolbar">
+                        {toolbar}
+                    </div>
+                </div>
+                <div class="pull-left">
+                    <div class="kv-panel-pager">
+                        {pager}
+                    </div>
+                </div>
+                {before}
+                <div class="clearfix"></div>
+    ',
+]);
+echo '</div>';
 EOS;
-        $code .= "\n . '</div>' ";
-
         return $code;
     }
 
