@@ -153,10 +153,8 @@ class Generator extends \schmunk42\giiant\generators\crud\Generator
         if (!empty($this->searchModelClass))
         {
             $searchModel = Yii::getAlias('@'.str_replace('\\', '/', ltrim($this->searchModelClass, '\\').'.php'));
-            if ($this->overwriteSearchModelClass || !is_file($searchModel))
-            {
-                $files[] = new CodeFile($searchModel, $this->render('search.php'));
-            }
+
+            $files[] = new CodeFile($searchModel, $this->render('search.php'));
         }
 
         $viewPath     = $this->getViewPath();
