@@ -106,7 +106,10 @@ public function search()
 $query = <?= isset($modelAlias) ? $modelAlias : $modelClass ?>::find();
 
 $dataProvider = new ActiveDataProvider([
-'query' => $query,
+        'query' => $query,
+        'pagination' => [
+            'pageSize' => 50,
+        ],
 ]);
 
 if (!$this->validate()) {
