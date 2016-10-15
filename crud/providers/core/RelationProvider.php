@@ -214,7 +214,7 @@ EOS;
         $pageParam      = Inflector::slug("page-{$name}");
         $firstPageLabel = $this->generator->generateString('First');
         $lastPageLabel  = $this->generator->generateString('Last');
-        $relationship   = "'".key($relation->link)."' => \$model->".$model->primaryKey()[0];
+        $relationship   = "'".key($relation->link)."' => \$model->".(new $this->generator->modelClass)->primaryKey()[0];
         $code           = <<<EOS
 
 \${$actionControlClass} = new \\{$actionControlClassname};
@@ -232,7 +232,7 @@ echo GridView::widget([
     'dataProvider' => new \\yii\\data\\ActiveDataProvider([
         {$query},
         'pagination' => [
-            'pageSize' => 20,
+            'pageSize' => 50,
             'pageParam'=>'{$pageParam}',
         ]
     ]),
@@ -261,6 +261,10 @@ echo GridView::widget([
 	'responsive'          => true,
 	'hover'               => true,
 	'showPageSummary'     => true,
+            'pageSummaryRowOptions' => [
+                'class' => 'kv-page-summary',
+                'style' => 'height: 100px;'
+            ],
 	'persistResize'       => false,
 	'exportConfig'        => [
 		GridView::EXCEL => [
