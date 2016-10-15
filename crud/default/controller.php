@@ -108,7 +108,7 @@ public function actionIndex()
 
     if ($actionControl->allow('index') == FALSE)
     {
-        return $actionControl->exception('index');
+        throw $actionControl->exception('index');
     }
 
 <?php if ($searchModelClass !== '') {
@@ -150,7 +150,7 @@ public function actionDeleted()
 
     if ($actionControl->allow('deleted') == FALSE)
     {
-        return $actionControl->exception('deleted');
+        throw $actionControl->exception('deleted');
     }
 
 <?php if ($searchModelClass !== '') {
@@ -195,7 +195,7 @@ public function actionView(<?= $actionParams ?>)
 
     if ($actionControl->allow('view') == FALSE)
     {
-        return $actionControl->exception('view');
+        throw $actionControl->exception('view');
     }
 
 \Yii::$app->session['__crudReturnUrl'] = ReturnUrl::getUrl(Url::previous());
@@ -221,7 +221,7 @@ $model = new <?= $modelClass ?>Form;
 
     if ($actionControl->allow('create') == FALSE)
     {
-        return $actionControl->exception('create');
+        throw $actionControl->exception('create');
     }
 
 try {
@@ -255,7 +255,7 @@ $model = $this->findForm(<?= $actionParams ?>);
 
     if ($actionControl->allow('update') == FALSE)
     {
-        return $actionControl->exception('update');
+        throw $actionControl->exception('update');
     }
 
 if ($model->load($_POST) && $model->save()) {
