@@ -66,4 +66,16 @@ class <?= $className ?>ActControl extends \fredyns\lbac\ActionControl
         );
     }
 
+<?php if ($tableSchema->getColumn('deleted_at') !== null): ?>
+    /**
+     * check permission to access Deleted page
+     *
+     * @return boolean
+     */
+    public function getAllowDeleted()
+    {
+        return true;
+    }
+<?php endif; ?>
+
 }
