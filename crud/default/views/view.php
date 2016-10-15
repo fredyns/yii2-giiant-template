@@ -34,8 +34,9 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 use yii\widgets\Pjax;
-use dmstr\bootstrap\Tabs;
 use cornernote\returnurl\ReturnUrl;
+use dmstr\bootstrap\Tabs;
+use fredyns\components\helpers\UserHelper;
 use kartik\grid\GridView;
 
 /**
@@ -73,18 +74,7 @@ $this->params['breadcrumbs'][] = $actionControl->breadcrumbLabel('view');
 
         <!-- menu buttons -->
         <div class='pull-left'>
-
-            <?= '<?= ' ?>$actionControl->button('index'); ?>
-
-            <?= '<?= ' ?>Html::a(
-            '<span class="glyphicon glyphicon-copy"></span> ' . <?= $generator->generateString('Copy') ?>,
-            ['create', 'ru' => ReturnUrl::getToken(), <?= $urlParams ?>, '<?= StringHelper::basename($generator->modelClass) ?>'=>$copyParams],
-            ['class' => 'btn btn-success']) ?>
-
-            <?= '<?= ' ?>Html::a(
-            '<span class="glyphicon glyphicon-plus"></span> ' . <?= $generator->generateString('New') ?>,
-            ['create', 'ru' => ReturnUrl::getToken()],
-            ['class' => 'btn btn-success']) ?>
+            <?= '<?= ' ?>$actionControl->buttons(['index', 'create']); ?>
         </div>
 
         <div class="pull-right">
@@ -106,8 +96,7 @@ $this->params['breadcrumbs'][] = $actionControl->breadcrumbLabel('view');
     'attributes' => [
     <?php
 
-    $hidenAttributes = [
-        'id',
+    $systemAttributes = [
         'recordStatus',
         'created_at',
         'created_by',
@@ -117,7 +106,10 @@ $this->params['breadcrumbs'][] = $actionControl->breadcrumbLabel('view');
         'deleted_by',
     ];
 
-    $safeAttributes = array_diff($safeAttributes, $hidenAttributes);
+    $infoAttributes = array_intersect((new $generator->modelClass)->attributes(), $systemAttributes);
+
+$systemAttributes[] = 'id';
+    $safeAttributes     = array_diff($safeAttributes, $systemAttributes);
 
     foreach ($safeAttributes as $attribute) {
         $format = $generator->attributeFormat($attribute);
@@ -190,6 +182,116 @@ EOS;
 ],\n
 EOS;
     }
+
+    if (empty($infoAttributes) == false)
+    {
+        echo "<?php \$this->beginBlock('info'); ?>\n";
+        echo <<<EOS
+    <?=
+    DetailView::widget([
+        'model' => \$model,
+        'attributes' => [\n
+EOS;
+
+        if (in_array('recordStatus', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'attribute' => 'recordStatus',
+                'format'    => 'html',
+                'value'     => '<span class="badge">'.\$model->recordStatus.'</span>',
+            ],\n
+EOS;
+        }
+
+        if (in_array('created_at', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'attribute' => 'created_at',
+                'format'    => [
+                    'date',
+                    'dateFormat' => 'php:d M Y, H:i (e, P)',
+                ],
+            ],\n
+EOS;
+        }
+
+        if (in_array('created_by', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'label'     => 'Created By',
+                'attribute' => 'createdBy.name',
+            ],\n
+EOS;
+        }
+
+        if (in_array('updated_at', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'attribute' => 'updated_at',
+                'format'    => [
+                    'date',
+                    'dateFormat' => 'php:d M Y, H:i (e, P)',
+                ],
+            ],\n
+EOS;
+        }
+
+        if (in_array('updated_by', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'label'     => 'Updated By',
+                'attribute' => 'updatedBy.name',
+            ],\n
+EOS;
+        }
+
+        if (in_array('deleted_at', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'attribute' => 'deleted_at',
+                'format'    => [
+                    'date',
+                    'dateFormat' => 'php:d M Y, H:i (e, P)',
+                ],
+            ],\n
+EOS;
+        }
+
+        if (in_array('deleted_by', $infoAttributes))
+        {
+            echo <<<EOS
+            [
+                'label'     => 'Deleted By',
+                'attribute' => 'deletedBy.name',
+            ],\n
+EOS;
+        }
+
+        echo <<<EOS
+EOS;
+
+        echo <<<EOS
+        ],
+    ]);
+    ?>
+EOS;
+        echo "<?php \$this->endBlock(); ?>\n\n";
+
+    $items .= <<<EOS
+[
+    'content' => \$this->blocks['info'],
+    'label'   => '<small>info</small>',
+    'active'  => false,
+    'visible'  => UserHelper::isAdmin(),
+],\n
+EOS;
+    }
     ?>
 
     <?=
@@ -203,5 +305,5 @@ EOS;
     );
     ?>";
     ?>
-
+    
 </div>
