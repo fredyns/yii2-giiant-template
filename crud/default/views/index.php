@@ -80,9 +80,6 @@ echo '?>';
 
 <div class="giiant-crud <?= Inflector::camel2id(StringHelper::basename($generator->modelClass), '-', true) ?>-index">
 
-    <!-- flash message -->
-    <?= "<?=" ?> $this->render('@vendor/fredyns/yii2-components/views/alert'); ?>
-
     <?=
     "<?php\n".($generator->indexWidgetType === 'grid' ? '// ' : '') ?>
     <?php if ($generator->searchModelClass !== ''): ?>
@@ -100,32 +97,7 @@ echo '?>';
             List
         </small>
     </h1>
-    <div class="clearfix crud-navigation">
-<?php
-if($generator->accessFilter){ 
-	echo "<?php\n"
-?>
-if(\Yii::$app->user->can('<?=$permisions['create']['name']?>', ['route' => true])){
-<?php
-echo "?>\n"
-?>
-        <div class="pull-right">
-            <?= '<?= ' ?>$actionControl->button('create'); ?>
-        </div>
-<?php
-	echo "<?php\n}\n?>";
-}else{
-?>
-        <div class="pull-right">
-            <?= '<?= ' ?>$actionControl->button('create'); ?>
-        </div>
-<?php
-}
-?>
-    </div>
-
-    <hr />
-
+    
     <div class="table-responsive">
         <?= '<?= ' ?>GridView::widget([
         'dataProvider' => $dataProvider,
@@ -181,7 +153,7 @@ echo "?>\n"
             'filterRowOptions'    => ['class' => 'kartik-sheet-style'],
             'pjax'                => FALSE, // pjax is set to always true for this demo
             'toolbar'             => [
-                '{export}',
+                $actionControl->button('create').' {export}',
             ],
             'export'              => [
                 'icon'  => 'export',
@@ -193,6 +165,10 @@ echo "?>\n"
             'responsive'          => true,
             'hover'               => true,
             'showPageSummary'     => true,
+            'pageSummaryRowOptions' => [
+                'class' => 'kv-page-summary',
+                'style' => 'height: 100px;'
+            ],
             'persistResize'       => false,
             'exportConfig'        => [
                 GridView::EXCEL => [

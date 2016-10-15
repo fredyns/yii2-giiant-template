@@ -52,13 +52,19 @@ $this->params['breadcrumbs'][] = $actionControl->breadcrumbLabel('view');
 ?>
 <div class="giiant-crud <?= Inflector::camel2id(StringHelper::basename($generator->modelClass), '-', true) ?>-view">
 
-    <!-- flash message -->
-    <?= "<?=" ?> $this->render('@vendor/fredyns/yii2-components/views/alert'); ?>
-
     <h1>
         <?= "<?= Yii::t('{$generator->modelMessageCategory}', '{$modelName}') ?>\n" ?>
         <small>
             <?= '<?= $model->'.$generator->getModelNameAttribute($generator->modelClass)." ?>\n" ?>
+
+<?php if (in_array('fredyns\components\traits\ModelSoftDelete', class_uses($generator->modelClass))): ?>
+
+            <?= "<?php" ?> if ($model->recordStatus == 'deleted'): ?>
+                <span class="badge">deleted</span>
+            <?= "<?php" ?> endif; ?>
+            
+<?php endif; ?>
+
         </small>
     </h1>
 
@@ -82,7 +88,7 @@ $this->params['breadcrumbs'][] = $actionControl->breadcrumbLabel('view');
         </div>
 
         <div class="pull-right">
-            <?= '<?= ' ?>$actionControl->dropdown(['items' => ['update', 'delete']]); ?>
+            <?= '<?= ' ?>$actionControl->buttons(['update', 'delete', 'restore']); ?>
         </div>
 
     </div>

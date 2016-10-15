@@ -32,9 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="giiant-crud <?= Inflector::camel2id(StringHelper::basename($generator->modelClass), '-', true) ?>-create">
 
-    <!-- flash message -->
-    <?= "<?=" ?> $this->render('@vendor/fredyns/yii2-components/views/alert'); ?>
-
     <h1>
         <?= "<?= Yii::t('{$generator->modelMessageCategory}', '{$modelName}') ?>\n" ?>
         <small>
