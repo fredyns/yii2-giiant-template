@@ -94,7 +94,7 @@ if(!empty($enum)){
     {
         return [
 <?php if (!empty($blameable)): ?>
-            [
+            'blameable' => [
                 'class' => BlameableBehavior::className(),
 <?php if ($blameable['createdByAttribute'] !== 'created_by'): ?>
                 'createdByAttribute' => <?= $blameable['createdByAttribute'] ? "'" . $blameable['createdByAttribute'] . "'" : 'false' ?>,
@@ -105,7 +105,7 @@ if(!empty($enum)){
             ],
 <?php endif; ?>
 <?php if (!empty($timestamp)): ?>
-            [
+            'timestamp' => [
                 'class' => TimestampBehavior::className(),
 <?php if ($timestamp['createdAtAttribute'] !== 'created_at'): ?>
                 'createdAtAttribute' => <?= $timestamp['createdAtAttribute'] ? "'" . $timestamp['createdAtAttribute'] . "'" : 'false' ?>,
