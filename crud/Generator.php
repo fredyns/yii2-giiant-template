@@ -207,4 +207,32 @@ class Generator extends \schmunk42\giiant\generators\crud\Generator
         return $files;
     }
 
+    /**
+     * search suficient model label
+     *
+     * @return string
+     */
+    public function getModelLabel()
+    {
+        $model        = new $this->modelClass;
+        $alternatives = [
+            'name',
+            'title',
+            'label',
+            'number',
+            'user_id',
+            'localtime',
+        ];
+
+        foreach ($alternatives as $attribute)
+        {
+            if ($model->hasAttribute($attribute))
+            {
+                return $attribute;
+            }
+        }
+
+        return $model->primaryKey()[0];
+    }
+
 }
