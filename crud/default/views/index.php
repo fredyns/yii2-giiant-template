@@ -113,6 +113,11 @@ echo '?>';
         'headerRowOptions' => ['class'=>'x'],
         'columns' => [
                 ['class' => 'kartik\grid\SerialColumn'],
+                [
+                    'class'         => 'fredyns\lbac\KartikViewColumn',
+                    'actionControl' => '<?= $actioncontrolPath; ?>',
+                    'attribute'     => '<?= $generator->getModelLabel(); ?>',
+                ],
         <?php
         $count = 0;
         echo "\n"; // code-formatting
@@ -126,6 +131,7 @@ echo '?>';
             'updated_by',
             'deleted_at',
             'deleted_by',
+            $generator->getModelLabel(),
         ];
 
         $safeAttributes = array_diff($safeAttributes, $hidenAttributes);
